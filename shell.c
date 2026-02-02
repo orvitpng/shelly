@@ -1,5 +1,6 @@
 #include "bool.h"
-#include "io.c"
+#include "debug.h"
+#include "io.h"
 
 void _start(void)
 {
@@ -8,7 +9,10 @@ void _start(void)
     while (true) {
         puts("# ");
 
-        /* TODO: do something with this */
-        gets();
+        char* str = gets();
+        if (!str)
+            printf("gets errored!\n");
+        else
+            printf("%p: %s\n", str, str);
     }
 }

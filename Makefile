@@ -1,4 +1,4 @@
-SRCS = shell.c shell.s
+SRC = shell.c shell.s mem.c list.c io.c debug.c
 LINK = link.ld
 
 # my alpine installation uses these executables for cross compilation
@@ -13,13 +13,13 @@ DEPFLAGS = -MMD -MP
 
 all: shell.bin
 
-shell.elf: $(SRCS) $(LINK)
+shell.elf: $(SRC) $(LINK)
 	$(CC) \
 		$(CFLAGS) \
 		$(LDFLAGS) \
 		$(DEPFLAGS) \
 		-o $@ \
-		$(filter-out $(LINK),$^)
+		$(SRC)
 
 -include shell.d
 

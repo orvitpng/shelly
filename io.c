@@ -1,3 +1,6 @@
+#include "bool.h"
+#include "list.h"
+
 #define ESC 0x1b
 #define DEL 0x7f
 
@@ -5,11 +8,6 @@
  * QEMU kindly implements this for simple I/O in virtual machines. */
 #define UART ((volatile unsigned char*)0x10000000)
 #define UART_LSR 5
-
-/* TODO: create a small memory allocator for buffering? */
-#define BUF_LEN 16
-
-static char buf[BUF_LEN];
 
 void putc(char c) { UART[0] = c; }
 
@@ -26,20 +24,16 @@ void puts(const char* str)
         putc(*str++);
 }
 
-#include "debug.c"
-
 char* gets()
 {
-    char* p = buf;
+    list_char buf = list_char_empty;
 
-    int i = 0;
     while (true) {
         char c = getc();
 
         if (c == DEL) {
-            if (i > 0) {
-                p--;
-                i--;
+            if (buf.len > 0) {
+                buf.len--;
                 puts("\b \b");
             }
             continue;
@@ -54,18 +48,19 @@ char* gets()
 
         if (c == '\r')
             break;
-        if (i == BUF_LEN - 1
-            || c < 0x20 || c >= 0x7f)
+        if (c < 0x20 || c >= 0x7f)
             continue;
 
-        *p++ = c;
-        i++;
+        if (!list_char_push(&buf, c)) {
+            list_char_deinit(&buf);
+            return 0;
+        }
 
         putc(c);
     }
 
-    *p = 0;
+    list_char_push(&buf, '\0');
     putc('\n');
 
-    return buf;
+    return list_char_take(&buf);
 }
