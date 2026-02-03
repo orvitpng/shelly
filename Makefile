@@ -1,47 +1,39 @@
-SRC = shell.c shell.s mem.c list.c io.c debug.c
-LINK = link.ld
+CC = clang
+LD = lld
+COPY = llvm-objcopy
 
-# my alpine installation uses these executables for cross compilation
-# it is likely that your distro uses different names
-CC = riscv-none-elf-gcc
-OBJCOPY = riscv-none-elf-objcopy
-OBJDUMP = riscv-none-elf-objdump
+ARCH ?= $(shell uname -m)
+ARCHES = riscv32
+ifeq ($(filter $(ARCH),$(ARCHES)),)
+	$(error Unsupported architecture \"$(ARCH)\")
+endif
 
-CFLAGS = -march=rv32im -mabi=ilp32 -nostdlib -ffreestanding -O2
-LDFLAGS = -T$(LINK) -nostdlib -Wl,--no-warn-rwx-segments
-DEPFLAGS = -MMD -MP
+CFLAGS += -fuse-ld=$(LD) -O2 -fPIC -Wno-main-return-type
+LDFLAGS += -nostdlib -Tlink.ld
+IFLAGS += -Iinclude -Iarch/$(ARCH)/include
 
-all: shell.bin
+include arch/$(ARCH)/config.mk
 
-shell.elf: $(SRC) $(LINK)
-	$(CC) \
-		$(CFLAGS) \
-		$(LDFLAGS) \
-		$(DEPFLAGS) \
-		-o $@ \
-		$(SRC)
+DIRS = src driver arch/$(ARCH)
+SRC_C = $(foreach dir,$(DIRS),$(shell find $(dir) -name "*.c"))
+SRC_S = $(foreach dir,$(DIRS),$(shell find $(dir) -name "*.s"))
+SRC = $(SRC_C) $(SRC_S)
 
--include shell.d
+all: kernel.bin
 
-shell.bin: shell.elf
-	$(OBJCOPY) \
-		-O binary \
-		$< $@
+kernel.elf: $(SRC) link.ld
+	$(CC) $(TARGET) $(CFLAGS) $(LDFLAGS) $(IFLAGS) \
+		-o $@ $(SRC)
 
-run: shell.bin
-	qemu-system-riscv32 \
-		-nographic \
-		-machine virt \
-		-bios none \
-		-kernel $<
+kernel.bin: kernel.elf
+	$(COPY) -O binary $< $@
 
-dump: shell.bin
-	$(OBJDUMP) \
-		-m riscv:rv32 \
-		-b binary \
-		-D shell.bin
+link.ld: link.ld.S
+	$(CC) $(TARGET) $(IFLAGS) \
+		-E $< -o $@
+
+run: kernel.bin
+	$(QEMU) -kernel $<
 
 clean:
-	rm -f shell.elf shell.bin shell.d
-
-.PHONY: all run dump clean
+	rm -f link.ld kernel.elf kernel.bin

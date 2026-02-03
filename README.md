@@ -1,16 +1,20 @@
 # shelly
 
-A tiny shell for your processor! Aims to be a Unix-like experience. Currently
-only targets RISC-V RV32IM capable processors.
+A tiny shell for your processor! Aims to be a Unix-like experience.
 
-This is my AP Computer Science Principles "Create" project, but also is good
-for learning and will be as extensive as I feel I want to know about computers
-at such a low level.
+This is my AP Computer Science Principles "Create" project, along with a great
+learning experience. It will be as extensive as I feel necessary to know about
+computers at such a low level.
+
+## TODO
+
+- Allocator shouldn't just bump/actually free stuff
+- Stop relying on DTB/FDT... maybe invent a new format
 
 ## AP CSP Requirements
 
-The following are the requirements my teacher gave me for this project, along
-with explanations of how I believe my porject implements them. 
+The following are the requirements for this project with explanations on why I
+believe my project implements them. 
 
 - Input from one of the following:
   - the user (including user actions that trigger events),
@@ -58,4 +62,5 @@ with explanations of how I believe my porject implements them.
   and program functionality
 
   The program's output, written over UART, is a function of the user's input and
-  adheres to the program functionality.
+  adheres exclusively to the program functionality, only depending on certain
+  interfaces with the hardware.
