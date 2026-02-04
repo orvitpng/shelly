@@ -1,12 +1,13 @@
 #ifndef DEF_H
 #define DEF_H
 
+#include <stdalign.h>
 #include <stddef.h>
 
-#include "def.S"
+#include "def.inc" // IWYU pragma: export
 
-#define ALIGN(a, b) ((a) & ~((b) - 1))
+#define ALIGN(align, size) (((size) + (align) - 1) & ~((align) - 1))
 
-#define HEAP_ALIGN _Alignof(max_align_t)
+#define HEAP_ALIGN alignof(max_align_t)
 
 #endif

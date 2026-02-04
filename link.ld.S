@@ -1,24 +1,37 @@
-#include <def.S>
-#include <arch/def.S>
+#include <def.inc>
+#include <arch/def.inc>
 
 ENTRY(_start)
 
 SECTIONS {
-    .text : { *(.text.init) *(.text*) }
-    .rodata : { *(.rodata*) }
-    .data : { *(.data*) }
+	.blob :
+	{
+		*(.text.start)
+		*(.text*)
+		*(.rodata*)
+		*(.data*)
+	}
 
-	. = ALIGN(4);
-    __bss = .;
-    .bss : { *(.bss*) }
-    __bss_end = .;
+	.reloc :
+	{
+		__reloc_start = .;
+		*(.rela*)
+		__reloc_end = .;
+	}
+
+	.bss :
+	{
+		__bss_start = .;
+		*(.bss*)
+		__bss_end = .;
+	}
 
     . = ALIGN(STACK_ALIGN);
     . += 0x1000;
-    __stack = .;
+    __stack_end = .;
 
     . = ALIGN(PAGE_SIZE);
-    __heap = .;
+    __heap_start = .;
     . += 0x10000;
     __heap_end = .;
 }

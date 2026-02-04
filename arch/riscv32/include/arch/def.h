@@ -1,8 +1,6 @@
 #ifndef ARCH_DEF_H
 #define ARCH_DEF_H
 
-#include "def.S"
-
-#define STACK_ALIGN 16
+#include "def.inc" // IWYU pragma: export
 
 #endif

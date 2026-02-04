@@ -6,11 +6,6 @@ This is my AP Computer Science Principles "Create" project, along with a great
 learning experience. It will be as extensive as I feel necessary to know about
 computers at such a low level.
 
-## TODO
-
-- Allocator shouldn't just bump/actually free stuff
-- Stop relying on DTB/FDT... maybe invent a new format
-
 ## AP CSP Requirements
 
 The following are the requirements for this project with explanations on why I
