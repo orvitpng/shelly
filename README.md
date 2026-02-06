@@ -6,6 +6,10 @@ This is my AP Computer Science Principles "Create" project, along with a great
 learning experience. It will be as extensive as I feel necessary to know about
 computers at such a low level.
 
+Update: I have legitimately learned more in the past couple of weeks of research
+into RISC-V, hardware design, and kernels than I have learned in the past year
+or two of all my other random shenanigans.
+
 ## AP CSP Requirements
 
 The following are the requirements for this project with explanations on why I

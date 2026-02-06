@@ -1,40 +1,53 @@
 CC = clang
 LD = ld.lld
+CP = llvm-objcopy
+
+DIRS = src driver arch/$(ARCH)
+IS = $(patsubst %,-I%/include,$(filter-out src,$(DIRS))) -Iinclude
+
+CFLAGS += $(IS) -ffreestanding -fpie -Wall
+LDFLAGS += -T$(BUILD)/link.ld -pie
+CPFLAGS += -Obinary
 
 ARCH ?= $(shell uname -m)
 include arch/$(ARCH)/config.mk
 
-DIRS = src driver arch/$(ARCH)
 BUILD = build/$(ARCH)
-
-CFLAGS += -ffreestanding -fpie -O2
-LDFLAGS += -T$(BUILD)/link.ld -pie
-IFLAGS += -Iinclude -Iarch/$(ARCH)/include
 
 OBJS = $(foreach dir,$(DIRS),\
 	   $(patsubst %.c,$(BUILD)/%.c.o,$(shell find $(dir) -name "*.c")) \
-	   $(patsubst %.s,$(BUILD)/%.s.o,$(shell find $(dir) -name "*.s")))
+	   $(patsubst %.s,$(BUILD)/%.s.o,$(shell find $(dir) -name "*.s")) \
+	   $(patsubst %.S,$(BUILD)/%.S.o,$(shell find $(dir) -name "*.S")))
 
 all: $(BUILD)/exec
 
 $(BUILD)/link.ld: link.ld.S
 	@mkdir -p $(dir $@)
-	$(CC) $(TARGET) $(IFLAGS) \
+	$(CC) $(TARGET) $(IS) \
 		-E -P $< -o $@
 
 $(BUILD)/%.c.o: %.c
 	@mkdir -p $(dir $@)
 	$(CC) $(TARGET) $(CFLAGS) \
-		$(IFLAGS) -c $< -o $@
+		-c $< -o $@
 
 $(BUILD)/%.s.o: %.s
 	@mkdir -p $(dir $@)
-	$(CC) $(TARGET) \
-		$(IFLAGS) -c $< -o $@
+	$(CC) $(TARGET) $(IS) \
+		-c $< -o $@
 
-$(BUILD)/exec: $(OBJS) $(BUILD)/link.ld
+$(BUILD)/%.S.o: %.S
+	@mkdir -p $(dir $@)
+	$(CC) $(TARGET) $(IS) \
+		-c $< -o $@
+
+$(BUILD)/exec.o: $(OBJS) $(BUILD)/link.ld
 	$(LD) $(LDFLAGS) \
-		--oformat=binary -o $@ $(OBJS)
+		$(OBJS) -o $@
+
+$(BUILD)/exec: $(BUILD)/exec.o
+	$(CP) $(CPFLAGS) \
+		$< $@
 
 clean:
-	rm -rf $(BUILD)
+	rm -rf build

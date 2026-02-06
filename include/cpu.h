@@ -8,9 +8,9 @@
 
 #include <stdint.h>
 
-#include "builtin.h"
+#include <builtin.h>
 
-inline uint32_t be32(uint32_t a)
+static inline uint32_t be32(uint32_t a)
 {
     return bswap32(a);
 }

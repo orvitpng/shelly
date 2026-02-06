@@ -1,1 +1,2 @@
-TARGET = -target riscv32 -march=rv32im
+DIRS += arch/riscv
+TARGET = --target=riscv32 -march=rv32ima

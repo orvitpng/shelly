@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <stdint.h>
 
-#include "def.h"
+#include <def.h>
 
 extern uint8_t __heap_start[];
 extern uint8_t __heap_end[];

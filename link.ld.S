@@ -1,5 +1,5 @@
-#include <def.inc>
-#include <arch/def.inc>
+#include <def.h>
+#include <arch/def.h>
 
 ENTRY(_start)
 
@@ -27,11 +27,11 @@ SECTIONS {
 	}
 
     . = ALIGN(STACK_ALIGN);
-    . += 0x1000;
+    . += STACK_SIZE;
     __stack_end = .;
 
     . = ALIGN(PAGE_SIZE);
     __heap_start = .;
-    . += 0x10000;
+    . += HEAP_SIZE;
     __heap_end = .;
 }
