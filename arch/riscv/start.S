@@ -1,33 +1,34 @@
 #include <arch/asm.h>
 
-.section	.text.start
+.section	.text
 
 .global		_start
-_start:		la			t0,			boot
-			li			t1,			1
-			amoswap.w	t1,			t1,			0(t0)
-			bnez		t1,			_park
+_start:		auipc	t0,		0
+			la		t1,		__reloc_start
+			la		t2,		__reloc_end
+			beq		t1,		t2,				1f
 
-			la			a0,			_main
-			csrw		stvec,		a0
-			csrw		mepc,		a0
+0:			L	    t3,		0 * Z(t1)
+			L   	t4,		1 * Z(t1)
+			L   	t5,		2 * Z(t1)
+			addi	t1,		t1,				3 * Z
 
-			la			t0,			trap
-			csrw		mtvec,		t0
+			andi	t4,		t4,				0xff
+			li		t6,		3
+			bne		t4,		t6,				0b
 
-			li			t0,			(1 << 11)		# MPP = 1 (S mode)
-            li          t1,         0x1f            # R W X
-            li          t2,         -1
-			csrw		mstatus,	t0
-            csrw        pmpcfg0,    t1
-            csrw        pmpaddr0,   t2
+			add		t3,		t3,				t0
+			add		t5,		t5,				t0
+			S   	t5,		0 * Z(t3)
+			bne		t1,		t2,				0b
 
-			csrr		a0,			mhartid
-            mret
+1:			la		t0,		__bss_start
+			la		t1,		__bss_end
+			beq		t0,		t1,				1f
 
-trap:
+0:			S   	zero,	0 * Z(t0)
+			addi	t0,		t0,				Z
+			bne		t0,		t1,				0b
 
-.section	.data
-
-.align		A
-boot:		N		0
+1:			la		sp,		__stack_end
+			j		start

@@ -1,8 +1,8 @@
 #include <cpu.h>
 #include <stdint.h>
 
-#include "def.h"
-#include "fdt.h"
+#include <def.h>
+#include <driver/fdt.h>
 
 #define FDT_VERSION 17
 #define FDT_MAGIC 0xd00dfeed

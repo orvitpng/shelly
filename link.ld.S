@@ -1,9 +1,10 @@
 #include <def.h>
 #include <arch/def.h>
 
-ENTRY(_start)
+ENTRY(_entry)
 
 SECTIONS {
+    __start = .;
 	.blob :
 	{
 		*(.text.start)
@@ -34,4 +35,5 @@ SECTIONS {
     __heap_start = .;
     . += HEAP_SIZE;
     __heap_end = .;
+    __end = .;
 }

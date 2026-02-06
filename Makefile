@@ -3,11 +3,6 @@ LD = ld.lld
 CP = llvm-objcopy
 
 DIRS = src driver arch/$(ARCH)
-IS = $(patsubst %,-I%/include,$(filter-out src,$(DIRS))) -Iinclude
-
-CFLAGS += $(IS) -ffreestanding -fpie -Wall
-LDFLAGS += -T$(BUILD)/link.ld -pie
-CPFLAGS += -Obinary
 
 ARCH ?= $(shell uname -m)
 include arch/$(ARCH)/config.mk
@@ -18,6 +13,11 @@ OBJS = $(foreach dir,$(DIRS),\
 	   $(patsubst %.c,$(BUILD)/%.c.o,$(shell find $(dir) -name "*.c")) \
 	   $(patsubst %.s,$(BUILD)/%.s.o,$(shell find $(dir) -name "*.s")) \
 	   $(patsubst %.S,$(BUILD)/%.S.o,$(shell find $(dir) -name "*.S")))
+IS = $(patsubst %,-I%/include,$(filter-out src,$(DIRS))) -Iinclude
+
+CFLAGS += $(IS) -ffreestanding -fpie -Wall -O3
+LDFLAGS += -T$(BUILD)/link.ld -pie
+CPFLAGS += -Obinary
 
 all: $(BUILD)/exec
 
